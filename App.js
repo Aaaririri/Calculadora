@@ -2,26 +2,30 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NativeBaseProvider, Box, Button } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
+import { RecoilRoot } from 'recoil';
 import Footer from './src/components/Footer';
-import Tecla from './src/components/Tecla';
+import Teclado from './src/components/Teclado';
+import Display from './src/components/Display';
+
 export default function App() {
   return (
-    <NativeBaseProvider>
-      <LinearGradient
-        colors={['rgba(79,152,213,0.8)', 'transparent']}
-        style={styles.container}
-      >
-        <Tecla text={'a'} />
-      </LinearGradient>
-      <Footer />
-    </NativeBaseProvider>
+    <RecoilRoot>
+      <NativeBaseProvider>
+        <LinearGradient
+          colors={['rgba(79,152,213,0.8)', 'transparent']}
+          style={styles.container}
+        >
+          <Display />
+          <Teclado />
+        </LinearGradient>
+        <Footer />
+      </NativeBaseProvider>
+    </RecoilRoot>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

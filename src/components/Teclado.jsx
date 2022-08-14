@@ -1,42 +1,16 @@
 import { Button } from 'native-base';
-import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  View,
-  FlatList,
-  StyleSheet,
-  Text,
-  StatusBar,
-} from 'react-native';
+import React from 'react';
+import { SafeAreaView, FlatList, StyleSheet, Text } from 'react-native';
+import { OPERATORS, OPE1, OPE2, NUMBERS } from '../utils/constants';
+import { calculatorState, resultState } from '../recoil/atoms/Calculadora';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
-const OPERATORS = ['+', '-', '/', 'x', '.'];
-const DATA = [
-  '+',
-  '-',
-  '/',
-  'x',
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '.',
-  '=',
-  'CLS',
-  'DEL',
-];
-
-const Tecla = ({ item, updateCalc }) => (
+const Tecla = ({ item, updateValues }) => (
   <Button
-    colorScheme={'blue'}
-    style={styles.item}
+    colorScheme={!NUMBERS.includes(item) ? 'blueGray' : 'blue'}
+    style={!NUMBERS.includes(item) ? styles.itemGray : styles.itemBlue}
     onPress={() => {
-      updateCalc(item);
+      updateValues(item);
     }}
   >
     <Text style={styles.title}>{item}</Text>
@@ -44,8 +18,8 @@ const Tecla = ({ item, updateCalc }) => (
 );
 
 const Teclado = () => {
-  const [calc, setCalc] = useState('');
-  const [result, setResults] = useState('');
+  const [calc, setCalc] = useRecoilState(calculatorState);
+  const result = useRecoilValue(resultState);
 
   const updateCalc = (value) => {
     if (
@@ -54,36 +28,32 @@ const Teclado = () => {
     )
       return;
     setCalc(calc + value);
-    if (!OPERATORS.includes(value)) {
-      setResults(eval(calc + value).toString());
-    }
   };
 
-  const calculateResult = () => {
-    if (!OPERATORS.includes(calc.slice(-1))) setCalc(eval(calc).toString());
+  const accumulatedCalc = () => {
+    setCalc(result);
   };
 
-  const clearScreen = () => {
-    setCalc('');
-    setResults('');
+  const allClear = () => {
+    const newValue = '';
+    setCalc(newValue);
   };
 
-  const deleteLastValue = () => {
-    if (calc == '') return;
-    const newCalc = calc.slice(0, -1);
-    setCalc(newCalc);
+  const deleteValue = () => {
+    const newValue = calc.slice(0, -1);
+    setCalc(newValue);
   };
 
   const renderItem = ({ item }) => (
     <Tecla
       item={item}
-      updateCalc={
+      updateValues={
         item === '='
-          ? calculateResult
-          : item === 'CLS'
-          ? clearScreen
+          ? accumulatedCalc
+          : item === 'AC'
+          ? allClear
           : item === 'DEL'
-          ? deleteLastValue
+          ? deleteValue
           : updateCalc
       }
     />
@@ -91,9 +61,9 @@ const Teclado = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>{calc}</Text>
-      <FlatList data={DATA} numColumns={5} renderItem={renderItem} />
-      <Text>{result}</Text>
+      <FlatList data={OPE1} numColumns={4} renderItem={renderItem} />
+      <FlatList data={NUMBERS} numColumns={5} renderItem={renderItem} />
+      <FlatList data={OPE2} numColumns={4} renderItem={renderItem} />
     </SafeAreaView>
   );
 };
@@ -102,18 +72,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 3,
     alignSelf: 'center',
+    width: '90%',
     borderWidth: 10,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     padding: 10,
     borderBottomWidth: 0,
     borderColor: '#799dac',
   },
-  item: {
-    width: 50,
+  itemBlue: {
+    minWidth: 40,
     marginVertical: 8,
-    marginHorizontal: 8,
+    marginHorizontal: 4,
+  },
+  itemGray: {
+    minWidth: 50,
+    marginVertical: 8,
+    marginHorizontal: 4,
   },
   title: {
     fontSize: 22,

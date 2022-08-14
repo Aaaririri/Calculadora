@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { NativeBaseProvider, Box, Button } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { NativeBaseProvider } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RecoilRoot } from 'recoil';
 import Footer from './src/components/Footer';

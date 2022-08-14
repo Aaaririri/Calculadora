@@ -15,7 +15,6 @@ const DATA = [
   '-',
   '/',
   'x',
-  'DEL',
   '0',
   '1',
   '2',
@@ -28,13 +27,15 @@ const DATA = [
   '9',
   '.',
   '=',
+  'CLS',
+  'DEL',
 ];
 
 const Tecla = ({ item, updateCalc }) => (
   <Button
     colorScheme={'blue'}
     style={styles.item}
-    onClick={() => {
+    onPress={() => {
       updateCalc(item);
     }}
   >
@@ -46,23 +47,53 @@ const Teclado = () => {
   const [calc, setCalc] = useState('');
   const [result, setResults] = useState('');
 
-  const updateCalc = ({ value }) => {
+  const updateCalc = (value) => {
     if (
       (OPERATORS.includes(value) && calc === '') ||
-      (OPERATORS.includes(value) && OPERATORS(calc.slice(-1)))
+      (OPERATORS.includes(value) && OPERATORS.includes(calc.slice(-1)))
     )
       return;
     setCalc(calc + value);
+    if (!OPERATORS.includes(value)) {
+      setResults(eval(calc + value).toString());
+    }
   };
+
+  const calculateResult = () => {
+    if (!OPERATORS.includes(calc.slice(-1))) setCalc(eval(calc).toString());
+  };
+
+  const clearScreen = () => {
+    setCalc('');
+    setResults('');
+  };
+
+  const deleteLastValue = () => {
+    if (calc == '') return;
+    const newCalc = calc.slice(0, -1);
+    setCalc(newCalc);
+  };
+
   const renderItem = ({ item }) => (
-    <Tecla item={item} updateCalc={updateCalc} />
+    <Tecla
+      item={item}
+      updateCalc={
+        item === '='
+          ? calculateResult
+          : item === 'CLS'
+          ? clearScreen
+          : item === 'DEL'
+          ? deleteLastValue
+          : updateCalc
+      }
+    />
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <Text>{calc}</Text>
       <FlatList data={DATA} numColumns={5} renderItem={renderItem} />
-      <Tecla item={'AAA'} updateCalc={updateCalc} />
+      <Text>{result}</Text>
     </SafeAreaView>
   );
 };
